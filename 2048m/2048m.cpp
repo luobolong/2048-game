@@ -38,7 +38,7 @@ bool generate_randomly(int arr[4][4], bool is_changed) {
     * that is, the vector is possibly empty only after generating a new number.
     *   empty(after generation)     is_changed      behavior
     *   0                           0               Do not generate a new number and return true.
-    *   0		                    1               Generate a new number and return true.
+    *   0                           1               Generate a new number and return true.
     *   1                           0               Do not generate a new number and return true.
     *   1                           1               Check if failed. If failed return false else return true.
     */
