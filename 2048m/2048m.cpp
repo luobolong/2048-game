@@ -42,14 +42,14 @@ bool generate_randomly(int arr[4][4], bool is_changed) {
     *   1                           0               Do not generate a new number and return true.
     *   1                           1               Check if failed. If failed return false else return true.
     */
-    std::vector<std::vector<int>> zero_indexes;
+    std::vector<std::pair<int, int>> zero_indexes;
     for (int i = 0; i < 4; ++i)
     {
         for (int j = 0; j < 4; ++j) {
             if (arr[i][j] == 0) {
-                std::vector<int> idx;
-                idx.push_back(i);
-                idx.push_back(j);
+                std::pair<int, int> idx;
+                idx.first = i;
+                idx.second = j;
                 zero_indexes.push_back(idx);
             }
         }
@@ -59,7 +59,7 @@ bool generate_randomly(int arr[4][4], bool is_changed) {
         return true;
     }
     auto r_iter = select_randomly(zero_indexes.begin(), zero_indexes.end());
-    std::vector<int> r_idx = *r_iter;
+    std::pair<int, int> r_idx = *r_iter;
     zero_indexes.erase(r_iter);
 
     std::random_device rd;
@@ -68,11 +68,11 @@ bool generate_randomly(int arr[4][4], bool is_changed) {
     int r = dist(gen);
     if (r > 75)
     {
-        arr[r_idx[0]][r_idx[1]] = 4;
+        arr[r_idx.first][r_idx.second] = 4;
     }
     else
     {
-        arr[r_idx[0]][r_idx[1]] = 2;
+        arr[r_idx.first][r_idx.second] = 2;
     }
     if (zero_indexes.empty())
     {
