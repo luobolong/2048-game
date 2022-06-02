@@ -1,22 +1,9 @@
-#define NOMINMAX
 #include <random>
 #include <vector>
 #include <iostream>
 #include <iterator>
 #include <stdlib.h>
 #include <windows.h>
-
-void change_font()
-{
-    static CONSOLE_FONT_INFOEX  fontex;
-    fontex.cbSize = sizeof(CONSOLE_FONT_INFOEX);
-    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    GetCurrentConsoleFontEx(hOut, 0, &fontex);
-    fontex.FontWeight = 700;
-    fontex.dwFontSize.X = 30;
-    fontex.dwFontSize.Y = 30;
-    SetCurrentConsoleFontEx(hOut, NULL, &fontex);
-}
 
 template<typename Iter, typename RandomGenerator>
 Iter select_randomly(Iter start, Iter end, RandomGenerator& g) {
@@ -98,7 +85,12 @@ bool generate_randomly(int arr[4][4], bool is_changed) {
 void print(int arr[4][4]) {
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
-            std::cout << arr[i][j] << "\t";
+            if (arr[i][j] != 0) {
+                std::cout << arr[i][j];
+            } else {
+                std::cout << ".";
+            }
+            std::cout << "\t";
         }
         std::cout << std::endl;
     }
@@ -106,7 +98,6 @@ void print(int arr[4][4]) {
 
 int main()
 {
-    change_font();
     int arr[4][4]{ 0 };
     bool is_changed = true;
     generate_randomly(arr, is_changed);
@@ -116,7 +107,7 @@ int main()
 
     for (;;)
     {
-        system("CLS");
+        system("clear");
         if (!generate_randomly(arr, is_changed))
         {
             print(arr);
