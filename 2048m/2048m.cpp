@@ -3,7 +3,6 @@
 #include <iostream>
 #include <iterator>
 #include <stdlib.h>
-#include <windows.h>
 
 template<typename Iter, typename RandomGenerator>
 Iter select_randomly(Iter start, Iter end, RandomGenerator& g) {
