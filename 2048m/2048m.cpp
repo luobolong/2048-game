@@ -2,6 +2,7 @@
 #include <random>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <iterator>
 #include <stdlib.h>
 #include <windows.h>
@@ -18,35 +19,40 @@ void change_font()
     SetCurrentConsoleFontEx(hOut, NULL, &fontex);
 }
 
-template<typename Iter, typename RandomGenerator>
-Iter select_randomly(Iter start, Iter end, RandomGenerator& g) {
+template <typename Iter, typename RandomGenerator>
+Iter select_randomly(Iter start, Iter end, RandomGenerator &g)
+{
     std::uniform_int_distribution<> dis(0, std::distance(start, end) - 1);
     std::advance(start, dis(g));
     return start;
 }
 
-template<typename Iter>
-Iter select_randomly(Iter start, Iter end) {
+template <typename Iter>
+Iter select_randomly(Iter start, Iter end)
+{
     static std::random_device rd;
     static std::mt19937 gen(rd());
     return select_randomly(start, end, gen);
 }
 
-bool generate_randomly(int arr[4][4], bool is_changed) {
+bool generate_randomly(int arr[4][4], bool is_changed)
+{
     /*
-    * Before generating a new number, it's known that the vector is never empty,
-    * that is, the vector is possibly empty only after generating a new number.
-    *   empty(after generation)     is_changed      behavior
-    *   0                           0               Do not generate a new number and return true.
-    *   0                           1               Generate a new number and return true.
-    *   1                           0               Do not generate a new number and return true.
-    *   1                           1               Check if failed. If failed return false else return true.
-    */
+     * Before generating a new number, it's known that the vector is never empty,
+     * that is, the vector is possibly empty only after generating a new number.
+     *   empty(after generation)     is_changed      behavior
+     *   0                           0               Do not generate a new number and return true.
+     *   0                           1               Generate a new number and return true.
+     *   1                           0               Do not generate a new number and return true.
+     *   1                           1               Check if failed. If failed return false else return true.
+     */
     std::vector<std::pair<int, int>> zero_indexes;
     for (int i = 0; i < 4; ++i)
     {
-        for (int j = 0; j < 4; ++j) {
-            if (arr[i][j] == 0) {
+        for (int j = 0; j < 4; ++j)
+        {
+            if (arr[i][j] == 0)
+            {
                 std::pair<int, int> idx;
                 idx.first = i;
                 idx.second = j;
@@ -95,12 +101,18 @@ bool generate_randomly(int arr[4][4], bool is_changed) {
     return true;
 }
 
-void print(int arr[4][4]) {
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            if (arr[i][j] != 0) {
+void print(int arr[4][4])
+{
+    for (int i = 0; i < 4; ++i)
+    {
+        for (int j = 0; j < 4; ++j)
+        {
+            if (arr[i][j] != 0)
+            {
                 std::cout << arr[i][j];
-            } else {
+            }
+            else
+            {
                 std::cout << ".";
             }
         }
@@ -108,10 +120,42 @@ void print(int arr[4][4]) {
     }
 }
 
+void save(int arr[4][4])
+{
+    std::ofstream file("data.bin", std::ios::out | std::ios::binary | std::ios::trunc);
+    for (int i = 0; i < 4; ++i)
+    {
+        for (int j = 0; j < 4; ++j)
+        {
+            file.write(reinterpret_cast<const char *>(&arr[i][j]), sizeof(arr[i][j]));
+        }
+    }
+    file.close();
+}
+
+bool load(int arr[4][4])
+{
+    std::ifstream file("data.bin", std::ios::in | std::ios::binary);
+    if (!file.good())
+    {
+        std::cout << "Cannot open data.bin." << std::endl;
+        return false;
+    }
+    for (int i = 0; i < 4; ++i)
+    {
+        for (int j = 0; j < 4; ++j)
+        {
+            file.read(reinterpret_cast<char *>(&arr[i][j]), sizeof(arr[i][j]));
+        }
+    }
+    file.close();
+    return true;
+}
+
 int main()
 {
     change_font();
-    int arr[4][4]{ 0 };
+    int arr[4][4]{0};
     bool is_changed = true;
     generate_randomly(arr, is_changed);
 
@@ -176,11 +220,12 @@ int main()
             cmd = tolower(cmd);
             int tmp[4][4];
             memcpy(&tmp, &arr, sizeof tmp);
-            switch (cmd) {
+            switch (cmd)
+            {
             case 'w':
                 for (int i = 0; i < 4; ++i)
                 {
-                    int column[4]{ 0 };
+                    int column[4]{0};
                     int *ptr = column;
                     for (int j = 0; j < 4; ++j)
                     {
@@ -209,7 +254,8 @@ int main()
                     }
                     for (int j = 0; j < 4; ++j)
                     {
-                        if (arr[j][i] != column[j]) {
+                        if (arr[j][i] != column[j])
+                        {
                             is_changed = true;
                             tmp[j][i] = column[j];
                         }
@@ -225,7 +271,7 @@ int main()
             case 'a':
                 for (int i = 0; i < 4; ++i)
                 {
-                    int row[4]{ 0 };
+                    int row[4]{0};
                     int *ptr = row;
                     for (int j = 0; j < 4; ++j)
                     {
@@ -254,7 +300,8 @@ int main()
                     }
                     for (int j = 0; j < 4; ++j)
                     {
-                        if (arr[i][j] != row[j]) {
+                        if (arr[i][j] != row[j])
+                        {
                             is_changed = true;
                             tmp[i][j] = row[j];
                         }
@@ -270,7 +317,7 @@ int main()
             case 's':
                 for (int i = 0; i < 4; ++i)
                 {
-                    int column[4]{ 0 };
+                    int column[4]{0};
                     int *ptr = column;
                     for (int j = 3; j >= 0; --j)
                     {
@@ -299,7 +346,8 @@ int main()
                     }
                     for (int j = 0; j < 4; ++j)
                     {
-                        if (arr[j][i] != column[3 - j]) {
+                        if (arr[j][i] != column[3 - j])
+                        {
                             is_changed = true;
                             tmp[j][i] = column[3 - j];
                         }
@@ -315,7 +363,7 @@ int main()
             case 'd':
                 for (int i = 0; i < 4; ++i)
                 {
-                    int row[4]{ 0 };
+                    int row[4]{0};
                     int *ptr = row;
                     for (int j = 3; j >= 0; --j)
                     {
@@ -344,7 +392,8 @@ int main()
                     }
                     for (int j = 0; j < 4; ++j)
                     {
-                        if (arr[i][j] != row[3 - j]) {
+                        if (arr[i][j] != row[3 - j])
+                        {
                             is_changed = true;
                             tmp[i][j] = row[3 - j];
                         }
@@ -366,6 +415,22 @@ int main()
                 is_changed = false;
                 is_valid = true;
                 break;
+            case 'f':
+                save(arr);
+                is_valid = true;
+                break;
+            case 'g':
+                is_valid = load(arr);
+                break;
+            case 'h':
+                std::cout << "w: move upwards\n";
+                std::cout << "a: move leftwards\n";
+                std::cout << "s: move downwards\n";
+                std::cout << "d: move rightwards\n";
+                std::cout << "r: roll back once\n";
+                std::cout << "f: save data file\n";
+                std::cout << "g: load data file\n";
+                break;
             default:
                 std::cout << "Invalid command. Please input your command again.\n";
                 break;
@@ -374,4 +439,3 @@ int main()
     }
     return 0;
 }
-
